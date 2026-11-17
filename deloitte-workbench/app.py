@@ -345,10 +345,26 @@ if df is not None:
         if st.checkbox("Drop rows with missing values"):
             df = df.dropna()
 
-        st.divider()
         st.markdown("### 🤖 AI Co-Pilot")
-        st.caption("Connect your Google AI Studio key.")
-        api_key = st.text_input("Gemini API Key", type="password")
+        default_api_key = ""
+        try:
+            if "GEMINI_API_KEY" in st.secrets:
+                default_api_key = st.secrets["GEMINI_API_KEY"]
+        except FileNotFoundError:
+            default_api_key = ""
+
+        if default_api_key:
+            api_key = default_api_key
+            st.success("🔑 Hosted Gemini Engine: Active")
+            custom_key = st.text_input("Custom API Key (Optional Override)", type="password")
+            if custom_key:
+                api_key = custom_key
+        else:
+            st.caption("Connect your Google AI Studio key or set GEMINI_API_KEY in Secrets.")
+            api_key = st.text_input("Gemini API Key", type="password")
+        
+        
+        
 
     # Section 1: Data Health Overview + Info Popover
     h1_col, h1_info = st.columns([6, 1])
@@ -371,26 +387,67 @@ if df is not None:
 
     st.write("")
 
-    # Section 2: AI Data Instruction Box + Info Popover
+    # Section 2: AI Data Instruction Box + Consulting Prompt Playbook
     h2_col, h2_info = st.columns([6, 1])
     with h2_col:
         st.subheader("2. AI Data Instruction Box")
     with h2_info:
-        with st.popover("ℹ️ Prompt Tips"):
+        with st.popover("📘 Prompt Booklet"):
             st.markdown("""
-            **Example Instructions to Try:**
-            - *"Sort rows by Engagement_Score descending"*
-            - *"Filter rows where Attrition_Risk > 3.0"*
-            - *"Create a Risk_Tier column labeled 'High' if Attrition_Risk >= 3.5 else 'Normal'"*
-            - *"Keep only Department, Region, and Engagement_Score columns"*
+            **C.Arch Multi-Task Prompting Guide:**
+            Chain multiple cleaning, segmentation, and analytical operations in a single command:
+
+            - **1. Executive Data Hygiene:**
+              *"Standardize text columns to Title Case, strip extra whitespace, convert date columns to YYYY-MM-DD, and create a boolean 'is_complete' column where no fields are null."*
+            - **2. People Analytics & Risk Banding:**
+              *"Segment numeric scores into 'Low', 'Moderate', and 'High' tiers using quantiles, flag Z-score outliers (>2.5 or <-2.5) in 'outlier_flag', and compute a 0-100 composite index."*
+            - **3. Survey & Psychometric Scoring:**
+              *"Compute row-wise mean and standard deviation across numeric Likert items, classify top-quartile respondents as 'Elevated', and add 'straightline_flag' if all item scores match."*
+            - **4. Commercial Variance & Margin Audit:**
+              *"Calculate absolute and percentage variance between target and actual numeric columns, label rows 'Favorable', 'On-Target', or 'Unfavorable', and sort by impact."*
+            - **5. Filtering & Feature Ratios:**
+              *"Filter rows where Attrition_Risk > 3.0, compute a ratio between the top two numeric metrics, and keep only key reporting columns."*
             """)
 
-    instruction = st.text_input(
-        "Enter a plain-English transformation or filtering rule:",
-        placeholder="e.g., Filter rows where Attrition_Risk > 3.0 and sort by Engagement_Score descending"
+    PROMPT_PLAYBOOK = {
+        "Custom Multi-Task Command (Write your own below)": "",
+        "Scenario 1: Executive Data Hygiene & Standardization": (
+            "Standardize all text columns to Title Case, strip leading/trailing whitespace, "
+            "convert any date columns to ISO format (YYYY-MM-DD), and add a boolean 'is_complete_record' "
+            "column that is True only when all columns have non-null values."
+        ),
+        "Scenario 2: People Analytics — Risk Tiering & Outlier Audit": (
+            "Segment the primary numeric score column into 'Low', 'Moderate', and 'High' tiers using quantiles, "
+            "flag statistical outliers (Z-score > 2.5 or < -2.5) in a new 'outlier_flag' column, "
+            "and sort rows by highest risk first."
+        ),
+        "Scenario 3: Psychometric / Survey Scale Composite & Straightlining": (
+            "Compute row-wise mean and standard deviation across numeric survey columns into 'scale_mean' and 'scale_sd', "
+            "classify respondents in the top quartile as 'High_Bracket' in a 'severity_tier' column, "
+            "and create a boolean 'straightline_flag' where row standard deviation equals 0."
+        ),
+        "Scenario 4: Commercial Variance & Performance Ranking": (
+            "Identify budget/target and actual numeric columns, calculate 'variance_abs' and 'variance_pct', "
+            "classify rows as 'Favorable', 'On-Target', or 'Unfavorable', and rank rows by absolute variance."
+        ),
+    }
+
+    selected_scenario = st.selectbox(
+        "Consulting Scenario Playbook (Select a preset or write a custom multi-task prompt):",
+        options=list(PROMPT_PLAYBOOK.keys())
     )
 
-    if instruction:
+    instruction = st.text_area(
+        "Enter a plain-English or multi-step transformation command (Editable):",
+        value=PROMPT_PLAYBOOK[selected_scenario],
+        height=105,
+        placeholder="e.g., Filter rows where Attrition_Risk > 3.0, create a Risk_Tier column, and sort by Engagement_Score descending..."
+    )
+
+    run_ai = st.button("⚡ Execute AI Transformation", type="primary")
+
+    if run_ai and instruction:
+    
         if not api_key:
             st.warning("Open **☰ Controls** in the top-left bar and paste your Gemini API key to activate AI transformations.")
         else:
