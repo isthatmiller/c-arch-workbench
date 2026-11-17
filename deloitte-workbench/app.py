@@ -9,7 +9,7 @@ from google import genai
 # 1. PAGE CONFIGURATION (Glitch-Free Native Sidebar)
 # =============================================================================
 st.set_page_config(
-    page_title="C.Arch | Consulting Architecture v1.0",
+    page_title="C.Arch | Consulting Architecture & People Analytics",
     page_icon="🏛️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -56,7 +56,7 @@ def apply_carch_theme(is_dark: bool):
             color: {text_main} !important;
         }}
         .block-container {{
-            padding-top: 1.6rem !important;
+            padding-top: 2.8rem !important;
             padding-bottom: 2.5rem !important;
             max-width: 1360px;
         }}
@@ -189,8 +189,12 @@ def load_sample_consulting_data() -> pd.DataFrame:
     })
 
 # =============================================================================
-# 4. SESSION STATE & DATA INGESTION
+# 4. BRAND HEADER, SESSION STATE & DATA INGESTION
 # =============================================================================
+st.markdown("# 🏛️ C.Arch")
+st.markdown("#### Consulting Architecture & People Analytics Workbench")
+st.write("")
+
 if "active_ai_prompt" not in st.session_state:
     st.session_state.active_ai_prompt = ""
 if "ai_transformed_df" not in st.session_state:
@@ -231,7 +235,7 @@ elif use_sample:
 # =============================================================================
 with st.sidebar:
     st.markdown("## 🏛️ C.Arch")
-    st.caption("Consulting Architecture v1.0")
+    st.caption("Consulting Architecture & People Analytics")
 
     mode_toggle = st.toggle("🌙 Dark Mode", value=st.session_state.dark_mode)
     if mode_toggle != st.session_state.dark_mode:
