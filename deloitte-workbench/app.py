@@ -367,7 +367,7 @@ with st.sidebar:
             st.toast(f"Loaded: {chosen_template}")
 
 # =============================================================================
-# 6. MAIN WORKSPACE (Exact Original C.Arch Layout + Upgraded Tabs)
+# 6. MAIN WORKSPACE (Exact Original C.Arch Layout + Upgraded Tabs & Info Guides)
 # =============================================================================
 if df is not None:
     if st.session_state.ai_transformed_df is not None:
@@ -511,7 +511,7 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 3: CLEAN TABBED WORKSPACE (Preserves Original C.Arch Tab Flow)
+    # SECTION 3: CLEAN TABBED WORKSPACE (With Dedicated Info Popovers per Tab)
     # -------------------------------------------------------------------------
     tab_work, tab_piv, tab_seg, tab_corr, tab_calc, tab_docs = st.tabs([
         "📋 Working Dataset",
@@ -528,11 +528,56 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
 
     # TAB 1: WORKING DATASET
     with tab_work:
-        st.caption("Live table reflecting all active sidebar hygiene rules and AI transformations.")
-        st.dataframe(df, use_container_width=True, height=340)
+        w_top, w_info = st.columns([6, 1])
+        with w_top:
+            st.caption("Live table reflecting all active sidebar hygiene rules, AI commands, and Formula Builder columns.")
+        with w_info:
+            with st.popover("ℹ️ Info"):
+                st.markdown("""
+                **Working Dataset — How It Works:**
+                - **Live Pipeline:** Updates automatically whenever you toggle sidebar cleaning rules, execute an AI instruction, or apply a Formula Builder column.
+                - **Zero-Typo Schema Check:** Expand *Column Dictionary* below to inspect exact column names and data types before writing prompts.
+                - **Quick Search:** Filter rows visually without altering your exported dataset.
+                """)
+
+        q_col1, q_col2 = st.columns([2.5, 1.5])
+        with q_col1:
+            search_query = st.text_input("🔍 Quick Search / Filter Rows (Visual Preview):", placeholder="Type any keyword, category, or ID to filter view...")
+        with q_col2:
+            st.write("")
+            show_schema = st.checkbox("📑 Show Column Dictionary", value=False)
+
+        if show_schema:
+            schema_df = pd.DataFrame({
+                "Column Name": df.columns,
+                "Type": ["Numeric" if pd.api.types.is_numeric_dtype(df[c]) else "Text / Category" for c in df.columns],
+                "Unique Values": [df[c].nunique() for c in df.columns],
+                "Missing Cells": [int(df[c].isna().sum()) for c in df.columns],
+            })
+            st.dataframe(schema_df, use_container_width=True, hide_index=True)
+
+        display_df = df
+        if search_query:
+            mask = df.astype(str).apply(lambda col: col.str.contains(search_query, case=False, na=False)).any(axis=1)
+            display_df = df[mask]
+            st.caption(f"Showing {len(display_df)} matching rows out of {len(df)} total records.")
+
+        st.dataframe(display_df, use_container_width=True, height=340)
 
     # TAB 2: RECOMMENDED PIVOT TABLES
     with tab_piv:
+        p_top, p_info = st.columns([6, 1])
+        with p_top:
+            st.caption("Instant executive summaries and cross-tabulations modeled after Excel PivotTables.")
+        with p_info:
+            with st.popover("ℹ️ Info"):
+                st.markdown("""
+                **Recommended Pivot Tables — How It Works:**
+                - **Smart Auto-Detection:** C.Arch automatically pairs your primary category and metric columns into ready-made executive pivots.
+                - **`% of Total` Share:** Automatically calculated on single-dimension `sum` and `count` pivots for rapid Pareto / contribution analysis.
+                - **Workbook Sync:** Whatever Pivot Table is active here is automatically saved into the **`Pivot_Summary`** tab when you click **Export Multi-Sheet Excel (.xlsx)**.
+                """)
+
         if cat_cols and num_cols:
             recommendations = [
                 f"Recommended 1: Total {num_cols[0]} by {cat_cols[0]} (with % of Total)",
@@ -575,6 +620,17 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
 
     # TAB 3: GROUP SEGMENTATION
     with tab_seg:
+        s_top, s_info = st.columns([6, 1])
+        with s_top:
+            st.caption("Multi-metric breakdown (`Count`, `Mean`, and `Sum`) across every numeric variable simultaneously.")
+        with s_info:
+            with st.popover("ℹ️ Info"):
+                st.markdown("""
+                **Group Segmentation — How It Works:**
+                - **All-Metric View:** Unlike a single Pivot Table, Group Segmentation evaluates *every* numeric column simultaneously across your chosen category.
+                - **Consulting Tip:** Always check **`count`** alongside **`mean`** and **`sum`** so small sample groups are not mistaken for systemic trends.
+                """)
+
         if cat_cols and num_cols:
             seg_col = st.selectbox("Segment Dataset By:", cat_cols, key="seg_col")
             seg_summary = df.groupby(seg_col)[num_cols].agg(["count", "mean", "sum"]).round(2)
@@ -585,15 +641,54 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
 
     # TAB 4: BEHAVIORAL CORRELATION MATRIX
     with tab_corr:
+        c_top, c_info = st.columns([6, 1])
+        with c_top:
+            st.caption("Pearson correlation matrix measuring linear relationships across numeric variables.")
+        with c_info:
+            with st.popover("ℹ️ Info"):
+                st.markdown("""
+                **Behavioral Correlation Matrix — How It Works:**
+                - **`+0.70 to +1.00`:** Strong positive relationship (both metrics move up together).
+                - **`-0.70 to -1.00`:** Strong inverse relationship (as one rises, the other falls).
+                - **`-0.20 to +0.20`:** Little to no linear relationship.
+                - **Auto-Insights:** C.Arch automatically extracts the strongest variable pairs below the matrix to save scanning time.
+                """)
+
         if len(num_cols) >= 2:
-            st.caption("Pearson correlation matrix across numeric behavioral & financial variables:")
             corr_matrix = df[num_cols].corr().round(3)
             st.dataframe(corr_matrix, use_container_width=True)
+
+            # Auto-surface Top Strongest Correlations to reduce cognitive load
+            corr_pairs = (
+                corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+                .stack()
+                .reset_index()
+            )
+            corr_pairs.columns = ["Variable A", "Variable B", "Pearson r"]
+            corr_pairs["Abs_r"] = corr_pairs["Pearson r"].abs()
+            top_pairs = corr_pairs.sort_values("Abs_r", ascending=False).head(3)
+            if not top_pairs.empty:
+                st.markdown("**⚡ Key Correlation Takeaways (Auto-Detected):**")
+                for _, row in top_pairs.iterrows():
+                    direction = "positively" if row["Pearson r"] >= 0 else "inversely"
+                    st.write(f"- **{row['Variable A']}** and **{row['Variable B']}** are {direction} correlated (`r = {row['Pearson r']}`).")
         else:
             st.info("Requires at least two numeric variables to compute correlations.")
 
     # TAB 5: NO-CODE EXCEL FORMULA & CONDITIONAL IF BUILDER
     with tab_calc:
+        f_top, f_info = st.columns([6, 1])
+        with f_top:
+            st.caption("Create deterministic Excel-style calculated columns and conditional flags with zero code.")
+        with f_info:
+            with st.popover("ℹ️ How to Use Formula Builder"):
+                st.markdown("""
+                **How to Use Formula Builder (3 Steps):**
+                1. **Choose Formula Type:** Pick **Two-Column Math** (`+`, `-`, `*`, `/`, `% Delta`) for ratios/variances, or **Conditional IF Flag** (`=IF`) for risk/performance thresholds.
+                2. **Configure Inputs & Name:** Select your source column(s), set your operator or numeric threshold, and name your new output column.
+                3. **Activate:** Check **Apply Column to Working Dataset**—your new column immediately appears in the **Working Dataset** tab and is included in your final CSV/Excel export.
+                """)
+
         sub_math, sub_if = st.tabs(["Two-Column Math (+, -, *, /, % Delta)", "Conditional IF Flag (=IF)"])
         with sub_math:
             if len(num_cols) >= 2:
@@ -602,6 +697,11 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
                 op = fc2.selectbox("Operation", ["+ (Add)", "- (Subtract)", "* (Multiply)", "/ (Divide)", "% Change ((B-A)/A)"])
                 col_b = fc3.selectbox("Column B", num_cols, index=min(1, len(num_cols) - 1), key="calc_b")
                 new_col_name = fc4.text_input("New Column Name", value=f"{col_a}_vs_{col_b}")
+
+                op_symbol = op.split(" ")[0]
+                formula_preview = f"=ROUND(({col_b} - {col_a}) / {col_a} * 100, 2)" if op_symbol == "%" else f"={col_a} {op_symbol} {col_b}"
+                st.caption(f"Excel Formula Equivalent: `{formula_preview}`")
+
                 if st.checkbox("Apply Math Column to Working Dataset"):
                     if op.startswith("+"):
                         df[new_col_name] = df[col_a] + df[col_b]
@@ -613,6 +713,7 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
                         df[new_col_name] = np.where(df[col_b] != 0, df[col_a] / df[col_b], np.nan)
                     elif op.startswith("%"):
                         df[new_col_name] = np.where(df[col_a] != 0, ((df[col_b] - df[col_a]) / df[col_a]) * 100, np.nan).round(2)
+                    st.success(f"✅ Column `{new_col_name}` added to Working Dataset!")
             else:
                 st.info("Requires at least 2 numeric columns.")
 
@@ -625,6 +726,9 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
                 true_lbl = ic4.text_input("If True Label", value="High / Flagged")
                 false_lbl = ic5.text_input("If False Label", value="Normal")
                 if_out_name = st.text_input("Output Flag Column Name", value=f"{if_col}_Status")
+
+                st.caption(f'Excel Formula Equivalent: `=IF({if_col} {if_op} {if_val}, "{true_lbl}", "{false_lbl}")`')
+
                 if st.checkbox("Apply Conditional IF Column to Working Dataset"):
                     if if_op == ">":
                         cond = df[if_col] > if_val
@@ -637,17 +741,19 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
                     else:
                         cond = df[if_col] == if_val
                     df[if_out_name] = np.where(cond, true_lbl, false_lbl)
+                    st.success(f"✅ Flag column `{if_out_name}` added to Working Dataset!")
             else:
                 st.info("Requires at least 1 numeric column.")
 
     # TAB 6: USER GUIDE & DOCUMENTATION
     with tab_docs:
         st.markdown("""
-        ### 🏛️ C.Arch Platform Manual
-        1. **Sidebar Data Hygiene (12 Excel Controls):** Clean duplicates, trim spaces, standardize casing, impute blanks, format dates, and sort rows deterministically before analysis.
-        2. **Consulting Prompt Playbook (14 Templates):** Select any pre-built consulting or Excel scenario in the left sidebar and click **Load Prompt into Box** to populate the AI Data Instruction Box.
-        3. **Recommended Pivot Tables & Segmentation:** Inspect instant category aggregations, cross-tabs, and Pearson behavioral correlations.
-        4. **Executive Export:** Download your cleaned table as a `.csv` or export a multi-sheet `.xlsx` workbook containing `Cleaned_Data`, `Pivot_Summary`, and `Summary_Stats`.
+        ### 🏛️ C.Arch Platform Manual — Fast-Track Workflow
+        1. **Step 1 — Ingest & Audit:** Upload any CSV or Excel workbook at the top (or test with the built-in consulting dataset) and verify record counts, duplicates, and missing cells in **1. Data Health Overview**.
+        2. **Step 2 — Deterministic Hygiene (Left Sidebar):** Apply any of the **12 Quick Excel Controls** (`TRIM`, `PROPER`, deduplication, median/zero imputation, ISO dates, `Row_ID`, sorting) to standardize your data cleanly.
+        3. **Step 3 — AI Co-Pilot or No-Code Formulas:** Either pick one of the **14 Consulting Prompt Playbook** templates in the sidebar to run multi-step AI transformations, or use the **Formula Builder** tab for instant deterministic Excel math and `=IF` flags.
+        4. **Step 4 — Pivot & Behavioral Diagnostics:** Inspect auto-generated summaries in **Recommended Pivot Tables**, multi-metric breakdowns in **Group Segmentation**, and key drivers in **Behavioral Correlation Matrix**.
+        5. **Step 5 — Executive Deliverable Export:** Click **Export Deliverable (CSV)** for flat tables or **Export Multi-Sheet Excel (.xlsx)** to download a complete workbook containing `Cleaned_Data`, `Pivot_Summary`, and `Summary_Stats`.
         """)
 
     st.write("")
