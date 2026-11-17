@@ -16,47 +16,76 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. ORIGINAL C.ARCH MIDNIGHT NAVY / TEAL DESIGN SYSTEM + DARK/LIGHT TOGGLE
+# 2. FULL-SPECTRUM LIGHT & DARK MODE THEME ENGINE
 # =============================================================================
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = True
 
 def apply_carch_theme(is_dark: bool):
     if is_dark:
+        color_scheme = "dark"
         app_bg = "#070D19"
+        header_bg = "rgba(7, 13, 25, 0.92)"
         sidebar_bg = "#0E1628"
         card_bg = "#0C1526"
         card_border = "#0E7490"
         card_shadow = "0 4px 20px rgba(6, 182, 212, 0.08)"
         text_main = "#F8FAFC"
         text_muted = "#94A3B8"
+        placeholder_color = "#64748B"
         input_bg = "#131F38"
         input_border = "#1E293B"
+        btn_sec_bg = "#131F38"
+        btn_sec_hover = "#1E293B"
         tab_active = "#06B6D4"
         emerald_btn = "#10B981"
         emerald_hover = "#059669"
+        df_filter = "none"
     else:
+        color_scheme = "light"
         app_bg = "#F8FAFC"
+        header_bg = "rgba(248, 250, 252, 0.94)"
         sidebar_bg = "#F1F5F9"
         card_bg = "#FFFFFF"
         card_border = "#0891B2"
         card_shadow = "0 4px 14px rgba(15, 23, 42, 0.05)"
         text_main = "#0F172A"
         text_muted = "#475569"
+        placeholder_color = "#94A3B8"
         input_bg = "#FFFFFF"
         input_border = "#CBD5E1"
+        btn_sec_bg = "#FFFFFF"
+        btn_sec_hover = "#E2E8F0"
         tab_active = "#0891B2"
         emerald_btn = "#10B981"
         emerald_hover = "#059669"
+        # Cleanly inverts Streamlit's dark-default Glide Data Grid into crisp daylight cells
+        df_filter = "invert(0.93) hue-rotate(180deg) contrast(1.04)"
 
     st.markdown(f"""
     <style>
+        :root {{
+            color-scheme: {color_scheme};
+        }}
+
+        /* Main Canvas & Top Toolbar */
         .stApp {{
             background-color: {app_bg} !important;
             color: {text_main} !important;
         }}
+        header[data-testid="stHeader"] {{
+            background-color: {header_bg} !important;
+            color: {text_main} !important;
+            border-bottom: 1px solid {input_border} !important;
+        }}
+        header[data-testid="stHeader"] button,
+        header[data-testid="stHeader"] svg {{
+            color: {text_main} !important;
+            fill: {text_main} !important;
+        }}
+
         .block-container {{
-            padding-top: 2.8rem !important;
+            padding-top: 3.0rem !important;
             padding-bottom: 2.5rem !important;
             max-width: 1360px;
         }}
@@ -66,25 +95,23 @@ def apply_carch_theme(is_dark: bool):
             background-color: {sidebar_bg} !important;
             border-right: 1px solid {input_border} !important;
         }}
-        section[data-testid="stSidebar"] h1,
-        section[data-testid="stSidebar"] h2,
-        section[data-testid="stSidebar"] h3,
-        section[data-testid="stSidebar"] label,
-        section[data-testid="stSidebar"] p,
-        section[data-testid="stSidebar"] span {{
+        section[data-testid="stSidebar"] * {{
             color: {text_main} !important;
         }}
+        section[data-testid="stSidebar"] .stCaption p {{
+            color: {text_muted} !important;
+        }}
 
-        /* Main Headings & Copy */
-        h1, h2, h3, h4 {{
+        /* Global Typography */
+        h1, h2, h3, h4, h5, h6 {{
             color: {text_main} !important;
             font-weight: 700 !important;
             letter-spacing: -0.015em !important;
         }}
-        p, label, .stMarkdown {{
-            color: {text_main};
+        p, label, span, li, .stMarkdown {{
+            color: {text_main} !important;
         }}
-        .stCaption {{
+        .stCaption p {{
             color: {text_muted} !important;
         }}
 
@@ -107,30 +134,91 @@ def apply_carch_theme(is_dark: bool):
             font-weight: 700 !important;
         }}
 
-        /* Inputs, Text Areas & Selectboxes */
+        /* All Text Inputs, Text Areas & Selectboxes (Main + Sidebar) */
         .stTextArea textarea,
         .stTextInput input,
-        div[data-baseweb="select"] > div {{
+        .stNumberInput input,
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="base-input"] {{
             background-color: {input_bg} !important;
             color: {text_main} !important;
             border: 1px solid {input_border} !important;
             border-radius: 8px !important;
+        }}
+        .stTextArea textarea::placeholder,
+        .stTextInput input::placeholder {{
+            color: {placeholder_color} !important;
+            opacity: 1 !important;
+        }}
+        div[data-baseweb="select"] span,
+        div[data-baseweb="select"] svg {{
+            color: {text_main} !important;
+            fill: {text_main} !important;
+        }}
+        /* Dropdown Popup Menu List */
+        ul[role="listbox"],
+        li[role="option"] {{
+            background-color: {input_bg} !important;
+            color: {text_main} !important;
+        }}
+        li[role="option"]:hover {{
+            background-color: {btn_sec_hover} !important;
         }}
 
         /* File Uploader & Expanders */
         section[data-testid="stFileUploaderDropzone"],
-        div[data-testid="stExpander"] {{
+        div[data-testid="stExpander"],
+        details {{
             background-color: {card_bg} !important;
+            color: {text_main} !important;
             border: 1px solid {input_border} !important;
             border-radius: 10px !important;
         }}
+        div[data-testid="stExpander"] summary,
+        div[data-testid="stExpander"] summary * {{
+            background-color: {card_bg} !important;
+            color: {text_main} !important;
+        }}
 
-        /* Popover Buttons (Info & Prompt Tips) */
+        /* Popover Buttons & Popover Bodies (Info & Prompt Tips) */
         div[data-testid="stPopover"] > button {{
-            background-color: {input_bg} !important;
+            background-color: {btn_sec_bg} !important;
             color: {text_main} !important;
             border: 1px solid {input_border} !important;
             border-radius: 8px !important;
+        }}
+        div[data-testid="stPopover"] > button * {{
+            color: {text_main} !important;
+        }}
+        div[data-testid="stPopover"] > button:hover {{
+            background-color: {btn_sec_hover} !important;
+        }}
+        div[data-testid="stPopoverBody"] {{
+            background-color: {card_bg} !important;
+            color: {text_main} !important;
+            border: 1px solid {input_border} !important;
+        }}
+        div[data-testid="stPopoverBody"] * {{
+            color: {text_main} !important;
+        }}
+
+        /* Secondary Buttons (Including Sidebar 'Load Prompt into Box' & File Upload Browse) */
+        button[kind="secondary"],
+        section[data-testid="stFileUploaderDropzone"] button {{
+            background-color: {btn_sec_bg} !important;
+            color: {text_main} !important;
+            border: 1px solid {input_border} !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+        }}
+        button[kind="secondary"] *,
+        section[data-testid="stFileUploaderDropzone"] button * {{
+            color: {text_main} !important;
+        }}
+        button[kind="secondary"]:hover,
+        section[data-testid="stFileUploaderDropzone"] button:hover {{
+            background-color: {btn_sec_hover} !important;
+            border-color: {tab_active} !important;
         }}
 
         /* Primary Action Button */
@@ -140,6 +228,9 @@ def apply_carch_theme(is_dark: bool):
             border: none !important;
             border-radius: 8px !important;
             font-weight: 600 !important;
+        }}
+        button[kind="primary"] * {{
+            color: #FFFFFF !important;
         }}
         button[kind="primary"]:hover {{
             background-color: #0369A1 !important;
@@ -154,9 +245,21 @@ def apply_carch_theme(is_dark: bool):
             font-weight: 600 !important;
             padding: 0.55rem 1.2rem !important;
         }}
+        div[data-testid="stDownloadButton"] button * {{
+            color: #FFFFFF !important;
+        }}
         div[data-testid="stDownloadButton"] button:hover {{
             background-color: {emerald_hover} !important;
-            color: #FFFFFF !important;
+        }}
+
+        /* Alerts (st.success / st.info / st.warning) */
+        div[data-testid="stAlert"] {{
+            background-color: {card_bg} !important;
+            border: 1px solid {card_border} !important;
+            color: {text_main} !important;
+        }}
+        div[data-testid="stAlert"] * {{
+            color: {text_main} !important;
         }}
 
         /* Tabs Accent Bar */
@@ -164,9 +267,21 @@ def apply_carch_theme(is_dark: bool):
             color: {text_muted} !important;
             font-weight: 500 !important;
         }}
-        button[data-baseweb="tab"][aria-selected="true"] {{
+        button[data-baseweb="tab"] * {{
+            color: {text_muted} !important;
+        }}
+        button[data-baseweb="tab"][aria-selected="true"],
+        button[data-baseweb="tab"][aria-selected="true"] * {{
             color: {tab_active} !important;
             border-bottom-color: {tab_active} !important;
+        }}
+
+        /* Interactive DataFrames Synced with Theme */
+        div[data-testid="stDataFrame"] {{
+            filter: {df_filter};
+            border-radius: 10px !important;
+            overflow: hidden !important;
+            border: 1px solid {input_border} !important;
         }}
     </style>
     """, unsafe_allow_html=True)
@@ -237,7 +352,8 @@ with st.sidebar:
     st.markdown("## 🏛️ C.Arch")
     st.caption("Consulting Architecture & People Analytics")
 
-    mode_toggle = st.toggle("🌙 Dark Mode", value=st.session_state.dark_mode)
+    mode_label = "🌙 Dark Mode" if st.session_state.dark_mode else "☀️ Light Mode"
+    mode_toggle = st.toggle(mode_label, value=st.session_state.dark_mode)
     if mode_toggle != st.session_state.dark_mode:
         st.session_state.dark_mode = mode_toggle
         st.rerun()
@@ -536,7 +652,7 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
                 st.markdown("""
                 **Working Dataset — How It Works:**
                 - **Live Pipeline:** Updates automatically whenever you toggle sidebar cleaning rules, execute an AI instruction, or apply a Formula Builder column.
-                - **Zero-Typo Schema Check:** Expand *Column Dictionary* below to inspect exact column names and data types before writing prompts.
+                - **Zero-Typo Schema Check:** Toggle *Show Column Dictionary* below to inspect exact column names and data types before writing prompts.
                 - **Quick Search:** Filter rows visually without altering your exported dataset.
                 """)
 
@@ -658,7 +774,6 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
             corr_matrix = df[num_cols].corr().round(3)
             st.dataframe(corr_matrix, use_container_width=True)
 
-            # Auto-surface Top Strongest Correlations to reduce cognitive load
             corr_pairs = (
                 corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
                 .stack()
