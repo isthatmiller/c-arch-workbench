@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. FULL-SPECTRUM LIGHT & DARK MODE THEME ENGINE
+# 2. WHOOP AMOLED BLACK + LUMINOUS DELOITTE GREEN DESIGN SYSTEM
 # =============================================================================
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = True
@@ -24,43 +24,42 @@ if "dark_mode" not in st.session_state:
 def apply_carch_theme(is_dark: bool):
     if is_dark:
         color_scheme = "dark"
-        app_bg = "#070D19"
-        header_bg = "rgba(7, 13, 25, 0.92)"
-        sidebar_bg = "#0E1628"
-        card_bg = "#0C1526"
-        card_border = "#0E7490"
-        card_shadow = "0 4px 20px rgba(6, 182, 212, 0.08)"
-        text_main = "#F8FAFC"
-        text_muted = "#94A3B8"
-        placeholder_color = "#64748B"
-        input_bg = "#131F38"
-        input_border = "#1E293B"
-        btn_sec_bg = "#131F38"
-        btn_sec_hover = "#1E293B"
-        tab_active = "#06B6D4"
-        emerald_btn = "#10B981"
-        emerald_hover = "#059669"
+        app_bg = "#000000"                  # True WHOOP AMOLED Pitch Black
+        header_bg = "rgba(0, 0, 0, 0.94)"
+        sidebar_bg = "#08090C"              # Deep Obsidian Sidebar
+        card_bg = "#0E1015"                 # Elevated WHOOP Card Surface
+        card_border = "#1E222B"
+        accent_green = "#86BC25"            # Deloitte Signature Green
+        luminous_green = "#97D700"          # Luminous WHOOP-style Telemetry Green
+        accent_glow = "0 0 22px rgba(134, 188, 37, 0.14)"
+        primary_btn_text = "#000000"        # High-contrast black text on luminous green
+        text_main = "#FFFFFF"
+        text_muted = "#9CA3AF"
+        placeholder_color = "#6B7280"
+        input_bg = "#12151C"
+        input_border = "#242934"
+        btn_sec_bg = "#12151C"
+        btn_sec_hover = "#1B202B"
         df_filter = "none"
     else:
         color_scheme = "light"
-        app_bg = "#F8FAFC"
-        header_bg = "rgba(248, 250, 252, 0.94)"
-        sidebar_bg = "#F1F5F9"
+        app_bg = "#F5F7F6"
+        header_bg = "rgba(245, 247, 246, 0.95)"
+        sidebar_bg = "#ECEFED"
         card_bg = "#FFFFFF"
-        card_border = "#0891B2"
-        card_shadow = "0 4px 14px rgba(15, 23, 42, 0.05)"
-        text_main = "#0F172A"
-        text_muted = "#475569"
-        placeholder_color = "#94A3B8"
+        card_border = "#D1D9D4"
+        accent_green = "#6B9E16"
+        luminous_green = "#5C8A08"
+        accent_glow = "0 4px 14px rgba(15, 23, 42, 0.05)"
+        primary_btn_text = "#FFFFFF"
+        text_main = "#0B0D0C"
+        text_muted = "#4B5563"
+        placeholder_color = "#9CA3AF"
         input_bg = "#FFFFFF"
         input_border = "#CBD5E1"
         btn_sec_bg = "#FFFFFF"
-        btn_sec_hover = "#E2E8F0"
-        tab_active = "#0891B2"
-        emerald_btn = "#10B981"
-        emerald_hover = "#059669"
-        # Cleanly inverts Streamlit's dark-default Glide Data Grid into crisp daylight cells
-        df_filter = "invert(0.93) hue-rotate(180deg) contrast(1.04)"
+        btn_sec_hover = "#E4E9E6"
+        df_filter = "invert(0.94) hue-rotate(180deg) contrast(1.04)"
 
     st.markdown(f"""
     <style>
@@ -72,6 +71,7 @@ def apply_carch_theme(is_dark: bool):
         .stApp {{
             background-color: {app_bg} !important;
             color: {text_main} !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif !important;
         }}
         header[data-testid="stHeader"] {{
             background-color: {header_bg} !important;
@@ -90,7 +90,7 @@ def apply_carch_theme(is_dark: bool):
             max-width: 1360px;
         }}
 
-        /* Sidebar Styling (Preserves native collapse/expand button) */
+        /* Sidebar Styling */
         section[data-testid="stSidebar"] {{
             background-color: {sidebar_bg} !important;
             border-right: 1px solid {input_border} !important;
@@ -102,11 +102,16 @@ def apply_carch_theme(is_dark: bool):
             color: {text_muted} !important;
         }}
 
-        /* Global Typography */
-        h1, h2, h3, h4, h5, h6 {{
+        /* WHOOP-Inspired Bold Typography */
+        h1 {{
+            color: {text_main} !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.02em !important;
+        }}
+        h2, h3, h4 {{
             color: {text_main} !important;
             font-weight: 700 !important;
-            letter-spacing: -0.015em !important;
+            letter-spacing: 0.01em !important;
         }}
         p, label, span, li, .stMarkdown {{
             color: {text_main} !important;
@@ -115,26 +120,30 @@ def apply_carch_theme(is_dark: bool):
             color: {text_muted} !important;
         }}
 
-        /* Teal-Bordered KPI Metric Cards */
+        /* WHOOP Telemetry KPI Metric Cards with Luminous Deloitte Green Top Accent */
         div[data-testid="stMetric"] {{
             background-color: {card_bg} !important;
             border: 1px solid {card_border} !important;
+            border-top: 3px solid {luminous_green} !important;
             border-radius: 12px !important;
             padding: 18px 22px !important;
-            box-shadow: {card_shadow} !important;
+            box-shadow: {accent_glow} !important;
         }}
         div[data-testid="stMetricLabel"] p {{
             color: {text_muted} !important;
-            font-size: 0.88rem !important;
-            font-weight: 500 !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
         }}
         div[data-testid="stMetricValue"] div {{
             color: {text_main} !important;
-            font-size: 2.0rem !important;
-            font-weight: 700 !important;
+            font-size: 2.15rem !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.02em !important;
         }}
 
-        /* All Text Inputs, Text Areas & Selectboxes (Main + Sidebar) */
+        /* All Text Inputs, Text Areas & Selectboxes */
         .stTextArea textarea,
         .stTextInput input,
         .stNumberInput input,
@@ -144,6 +153,11 @@ def apply_carch_theme(is_dark: bool):
             color: {text_main} !important;
             border: 1px solid {input_border} !important;
             border-radius: 8px !important;
+        }}
+        .stTextArea textarea:focus,
+        .stTextInput input:focus {{
+            border-color: {luminous_green} !important;
+            box-shadow: 0 0 0 1px {luminous_green} !important;
         }}
         .stTextArea textarea::placeholder,
         .stTextInput input::placeholder {{
@@ -155,7 +169,6 @@ def apply_carch_theme(is_dark: bool):
             color: {text_main} !important;
             fill: {text_main} !important;
         }}
-        /* Dropdown Popup Menu List */
         ul[role="listbox"],
         li[role="option"] {{
             background-color: {input_bg} !important;
@@ -180,7 +193,7 @@ def apply_carch_theme(is_dark: bool):
             color: {text_main} !important;
         }}
 
-        /* Popover Buttons & Popover Bodies (Info & Prompt Tips) */
+        /* Popover Buttons & Bodies */
         div[data-testid="stPopover"] > button {{
             background-color: {btn_sec_bg} !important;
             color: {text_main} !important;
@@ -192,24 +205,25 @@ def apply_carch_theme(is_dark: bool):
         }}
         div[data-testid="stPopover"] > button:hover {{
             background-color: {btn_sec_hover} !important;
+            border-color: {luminous_green} !important;
         }}
         div[data-testid="stPopoverBody"] {{
             background-color: {card_bg} !important;
             color: {text_main} !important;
-            border: 1px solid {input_border} !important;
+            border: 1px solid {luminous_green} !important;
         }}
         div[data-testid="stPopoverBody"] * {{
             color: {text_main} !important;
         }}
 
-        /* Secondary Buttons (Including Sidebar 'Load Prompt into Box' & File Upload Browse) */
+        /* Secondary Buttons */
         button[kind="secondary"],
         section[data-testid="stFileUploaderDropzone"] button {{
             background-color: {btn_sec_bg} !important;
             color: {text_main} !important;
             border: 1px solid {input_border} !important;
             border-radius: 8px !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
         }}
         button[kind="secondary"] *,
         section[data-testid="stFileUploaderDropzone"] button * {{
@@ -218,62 +232,72 @@ def apply_carch_theme(is_dark: bool):
         button[kind="secondary"]:hover,
         section[data-testid="stFileUploaderDropzone"] button:hover {{
             background-color: {btn_sec_hover} !important;
-            border-color: {tab_active} !important;
+            border-color: {luminous_green} !important;
         }}
 
-        /* Primary Action Button */
+        /* Primary Action Button — Luminous Deloitte Green */
         button[kind="primary"] {{
-            background-color: #0284C7 !important;
-            color: #FFFFFF !important;
+            background-color: {luminous_green} !important;
+            color: {primary_btn_text} !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.02em !important;
+            box-shadow: 0 0 18px rgba(151, 215, 0, 0.25) !important;
         }}
         button[kind="primary"] * {{
-            color: #FFFFFF !important;
+            color: {primary_btn_text} !important;
         }}
         button[kind="primary"]:hover {{
-            background-color: #0369A1 !important;
+            background-color: {accent_green} !important;
         }}
 
-        /* Emerald Green Export Download Buttons */
+        /* Executive Export Download Buttons — Deloitte Green */
         div[data-testid="stDownloadButton"] button {{
-            background-color: {emerald_btn} !important;
-            color: #FFFFFF !important;
+            background-color: {accent_green} !important;
+            color: {primary_btn_text} !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             padding: 0.55rem 1.2rem !important;
         }}
         div[data-testid="stDownloadButton"] button * {{
-            color: #FFFFFF !important;
+            color: {primary_btn_text} !important;
         }}
         div[data-testid="stDownloadButton"] button:hover {{
-            background-color: {emerald_hover} !important;
+            background-color: {luminous_green} !important;
         }}
 
-        /* Alerts (st.success / st.info / st.warning) */
+        /* Alerts */
         div[data-testid="stAlert"] {{
             background-color: {card_bg} !important;
-            border: 1px solid {card_border} !important;
+            border: 1px solid {luminous_green} !important;
             color: {text_main} !important;
         }}
         div[data-testid="stAlert"] * {{
             color: {text_main} !important;
         }}
 
-        /* Tabs Accent Bar */
+        /* Luminous Deloitte Green Active Tab Bar & Glow */
         button[data-baseweb="tab"] {{
             color: {text_muted} !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            font-size: 0.82rem !important;
+            letter-spacing: 0.05em !important;
         }}
         button[data-baseweb="tab"] * {{
             color: {text_muted} !important;
         }}
         button[data-baseweb="tab"][aria-selected="true"],
         button[data-baseweb="tab"][aria-selected="true"] * {{
-            color: {tab_active} !important;
-            border-bottom-color: {tab_active} !important;
+            color: {luminous_green} !important;
+            border-bottom-color: {luminous_green} !important;
+        }}
+        div[data-baseweb="tab-highlight"] {{
+            background-color: {luminous_green} !important;
+            height: 3px !important;
+            box-shadow: 0 0 12px {luminous_green} !important;
         }}
 
         /* Interactive DataFrames Synced with Theme */
@@ -281,7 +305,7 @@ def apply_carch_theme(is_dark: bool):
             filter: {df_filter};
             border-radius: 10px !important;
             overflow: hidden !important;
-            border: 1px solid {input_border} !important;
+            border: 1px solid {card_border} !important;
         }}
     </style>
     """, unsafe_allow_html=True)
@@ -289,7 +313,7 @@ def apply_carch_theme(is_dark: bool):
 apply_carch_theme(st.session_state.dark_mode)
 
 # =============================================================================
-# 3. SAMPLE DATASET (Matches Original Nairobi/Mombasa/Kisumu Consulting Schema)
+# 3. SAMPLE DATASET (Consulting & People Analytics Schema)
 # =============================================================================
 @st.cache_data
 def load_sample_consulting_data() -> pd.DataFrame:
@@ -306,7 +330,7 @@ def load_sample_consulting_data() -> pd.DataFrame:
 # =============================================================================
 # 4. BRAND HEADER, SESSION STATE & DATA INGESTION
 # =============================================================================
-st.markdown("# 🏛️ C.Arch")
+st.markdown("# 🏛️ C.Arch <span style='color:#97D700;'>●</span>", unsafe_allow_html=True)
 st.markdown("#### Consulting Architecture & People Analytics Workbench")
 st.write("")
 
@@ -346,13 +370,13 @@ elif use_sample:
     df = load_sample_consulting_data()
 
 # =============================================================================
-# 5. SIDEBAR (Original C.Arch Branding + 12 Excel Controls + API + 14 Playbook)
+# 5. SIDEBAR (C.Arch Branding + 12 Excel Controls + API + 14 Playbook)
 # =============================================================================
 with st.sidebar:
-    st.markdown("## 🏛️ C.Arch")
+    st.markdown("## 🏛️ C.Arch <span style='color:#97D700;'>●</span>", unsafe_allow_html=True)
     st.caption("Consulting Architecture & People Analytics")
 
-    mode_label = "🌙 Dark Mode" if st.session_state.dark_mode else "☀️ Light Mode"
+    mode_label = "🌑 AMOLED Dark Mode" if st.session_state.dark_mode else "☀️ Daylight Mode"
     mode_toggle = st.toggle(mode_label, value=st.session_state.dark_mode)
     if mode_toggle != st.session_state.dark_mode:
         st.session_state.dark_mode = mode_toggle
@@ -390,7 +414,7 @@ with st.sidebar:
 
     st.divider()
 
-    # --- B. AI CO-PILOT (Hosted Secrets + Optional Override) ---
+    # --- B. AI CO-PILOT ---
     st.markdown("### 🤖 AI Co-Pilot")
     default_api_key = ""
     try:
@@ -401,7 +425,7 @@ with st.sidebar:
 
     if default_api_key:
         api_key = default_api_key
-        st.success("🔑 Hosted Gemini Engine: Active")
+        st.success("🟢 Hosted Gemini Engine: Active")
         with st.expander("Override API Key (Optional)", expanded=False):
             custom_key = st.text_input("Custom Gemini API Key", type="password")
             if custom_key:
@@ -483,7 +507,7 @@ with st.sidebar:
             st.toast(f"Loaded: {chosen_template}")
 
 # =============================================================================
-# 6. MAIN WORKSPACE (Exact Original C.Arch Layout + Upgraded Tabs & Info Guides)
+# 6. MAIN WORKSPACE
 # =============================================================================
 if df is not None:
     if st.session_state.ai_transformed_df is not None:
@@ -627,7 +651,7 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 3: CLEAN TABBED WORKSPACE (With Dedicated Info Popovers per Tab)
+    # SECTION 3: TABBED WORKSPACE (Luminous Deloitte Green Active Indicators)
     # -------------------------------------------------------------------------
     tab_work, tab_piv, tab_seg, tab_corr, tab_calc, tab_docs = st.tabs([
         "📋 Working Dataset",
@@ -874,7 +898,7 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 4: EMERALD GREEN EXPORT BUTTONS (CSV + MULTI-SHEET EXCEL)
+    # SECTION 4: LUMINOUS DELOITTE GREEN EXPORT BUTTONS
     # -------------------------------------------------------------------------
     exp_col1, exp_col2, _ = st.columns([1.4, 1.6, 3])
 
