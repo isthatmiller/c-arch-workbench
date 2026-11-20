@@ -6,7 +6,7 @@ import streamlit as st
 from google import genai
 
 # =============================================================================
-# 1. PAGE CONFIGURATION (Glitch-Free Native Sidebar)
+# 1. PAGE CONFIGURATION
 # =============================================================================
 st.set_page_config(
     page_title="C.Arch | Consulting Architecture & People Analytics",
@@ -16,49 +16,49 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 2. WHOOP AMOLED BLACK + LUMINOUS DELOITTE GREEN DESIGN SYSTEM
+# 2. WHOOP BIOMETRIC AMOLED + LUMINOUS GREEN DESIGN SYSTEM
 # =============================================================================
 if "dark_mode" not in st.session_state:
     st.session_state.dark_mode = True
 
-def apply_carch_theme(is_dark: bool):
+def apply_whoop_theme(is_dark: bool):
     if is_dark:
         color_scheme = "dark"
-        app_bg = "#000000"                  # True WHOOP AMOLED Pitch Black
+        app_bg = "#000000"                  # Pure OLED Black
         header_bg = "rgba(0, 0, 0, 0.94)"
-        sidebar_bg = "#08090C"              # Deep Obsidian Sidebar
-        card_bg = "#0E1015"                 # Elevated WHOOP Card Surface
-        card_border = "#1E222B"
-        accent_green = "#86BC25"            # Deloitte Signature Green
-        luminous_green = "#97D700"          # Luminous WHOOP-style Telemetry Green
-        accent_glow = "0 0 22px rgba(134, 188, 37, 0.14)"
-        primary_btn_text = "#000000"        # High-contrast black text on luminous green
+        sidebar_bg = "#07080A"              # Deep Carbon Sidebar
+        card_bg = "#101216"                 # WHOOP Elevated Tile
+        card_border = "#1E222A"
+        pill_bg = "#161920"
+        whoop_green = "#00F19F"             # WHOOP Luminous Recovery Green
+        deloitte_green = "#86BC25"          # Signature Deloitte Green
+        primary_text_on_accent = "#000000"
         text_main = "#FFFFFF"
-        text_muted = "#9CA3AF"
-        placeholder_color = "#6B7280"
-        input_bg = "#12151C"
-        input_border = "#242934"
-        btn_sec_bg = "#12151C"
-        btn_sec_hover = "#1B202B"
+        text_muted = "#8E95A2"
+        placeholder_color = "#5A6270"
+        input_bg = "#14171E"
+        input_border = "#232833"
+        btn_sec_bg = "#161920"
+        btn_sec_hover = "#202530"
         df_filter = "none"
     else:
         color_scheme = "light"
-        app_bg = "#F5F7F6"
-        header_bg = "rgba(245, 247, 246, 0.95)"
-        sidebar_bg = "#ECEFED"
+        app_bg = "#F3F5F4"
+        header_bg = "rgba(243, 245, 244, 0.95)"
+        sidebar_bg = "#EAECEB"
         card_bg = "#FFFFFF"
-        card_border = "#D1D9D4"
-        accent_green = "#6B9E16"
-        luminous_green = "#5C8A08"
-        accent_glow = "0 4px 14px rgba(15, 23, 42, 0.05)"
-        primary_btn_text = "#FFFFFF"
+        card_border = "#D5DDD8"
+        pill_bg = "#E4E8E6"
+        whoop_green = "#009E68"
+        deloitte_green = "#5C8A08"
+        primary_text_on_accent = "#FFFFFF"
         text_main = "#0B0D0C"
         text_muted = "#4B5563"
         placeholder_color = "#9CA3AF"
         input_bg = "#FFFFFF"
         input_border = "#CBD5E1"
         btn_sec_bg = "#FFFFFF"
-        btn_sec_hover = "#E4E9E6"
+        btn_sec_hover = "#E2E8E5"
         df_filter = "invert(0.94) hue-rotate(180deg) contrast(1.04)"
 
     st.markdown(f"""
@@ -67,11 +67,11 @@ def apply_carch_theme(is_dark: bool):
             color-scheme: {color_scheme};
         }}
 
-        /* Main Canvas & Top Toolbar */
+        /* Global Canvas & Typography */
         .stApp {{
             background-color: {app_bg} !important;
             color: {text_main} !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", sans-serif !important;
         }}
         header[data-testid="stHeader"] {{
             background-color: {header_bg} !important;
@@ -85,12 +85,12 @@ def apply_carch_theme(is_dark: bool):
         }}
 
         .block-container {{
-            padding-top: 3.0rem !important;
+            padding-top: 2.8rem !important;
             padding-bottom: 2.5rem !important;
-            max-width: 1360px;
+            max-width: 1380px;
         }}
 
-        /* Sidebar Styling */
+        /* Sidebar */
         section[data-testid="stSidebar"] {{
             background-color: {sidebar_bg} !important;
             border-right: 1px solid {input_border} !important;
@@ -102,16 +102,20 @@ def apply_carch_theme(is_dark: bool):
             color: {text_muted} !important;
         }}
 
-        /* WHOOP-Inspired Bold Typography */
-        h1 {{
+        /* WHOOP Uppercase Micro-Tracked Section Labels */
+        .whoop-section-label {{
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: {text_muted};
+            margin-bottom: 0.4rem;
+        }}
+
+        h1, h2, h3, h4 {{
             color: {text_main} !important;
             font-weight: 800 !important;
             letter-spacing: -0.02em !important;
-        }}
-        h2, h3, h4 {{
-            color: {text_main} !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.01em !important;
         }}
         p, label, span, li, .stMarkdown {{
             color: {text_main} !important;
@@ -120,30 +124,75 @@ def apply_carch_theme(is_dark: bool):
             color: {text_muted} !important;
         }}
 
-        /* WHOOP Telemetry KPI Metric Cards with Luminous Deloitte Green Top Accent */
-        div[data-testid="stMetric"] {{
-            background-color: {card_bg} !important;
-            border: 1px solid {card_border} !important;
-            border-top: 3px solid {luminous_green} !important;
-            border-radius: 12px !important;
-            padding: 18px 22px !important;
-            box-shadow: {accent_glow} !important;
+        /* WHOOP Telemetry Cards */
+        .whoop-card {{
+            background-color: {card_bg};
+            border: 1px solid {card_border};
+            border-radius: 16px;
+            padding: 20px 22px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }}
-        div[data-testid="stMetricLabel"] p {{
-            color: {text_muted} !important;
-            font-size: 0.78rem !important;
+        .whoop-card-title {{
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: {text_muted};
+            margin-bottom: 8px;
+        }}
+        .whoop-card-value {{
+            font-size: 2.35rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.1;
+            color: {text_main};
+        }}
+        .whoop-card-sub {{
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-top: 8px;
+            color: {whoop_green};
+        }}
+
+        /* WHOOP Pill-Shaped Tab Navigation */
+        div[data-baseweb="tab-list"] {{
+            background-color: {pill_bg} !important;
+            padding: 6px !important;
+            border-radius: 999px !important;
+            border: 1px solid {card_border} !important;
+            gap: 4px !important;
+        }}
+        button[data-baseweb="tab"] {{
+            border-radius: 999px !important;
+            padding: 8px 18px !important;
+            font-size: 0.76rem !important;
             font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.08em !important;
+            color: {text_muted} !important;
+            border: none !important;
+            transition: all 0.18s ease !important;
         }}
-        div[data-testid="stMetricValue"] div {{
-            color: {text_main} !important;
-            font-size: 2.15rem !important;
-            font-weight: 800 !important;
-            letter-spacing: -0.02em !important;
+        button[data-baseweb="tab"] * {{
+            color: {text_muted} !important;
+        }}
+        button[data-baseweb="tab"][aria-selected="true"] {{
+            background-color: {whoop_green} !important;
+            color: {primary_text_on_accent} !important;
+            box-shadow: 0 0 16px rgba(0, 241, 159, 0.28) !important;
+        }}
+        button[data-baseweb="tab"][aria-selected="true"] * {{
+            color: {primary_text_on_accent} !important;
+        }}
+        div[data-baseweb="tab-highlight"],
+        div[data-baseweb="tab-border"] {{
+            display: none !important;
         }}
 
-        /* All Text Inputs, Text Areas & Selectboxes */
+        /* Inputs, Text Areas & Selectboxes */
         .stTextArea textarea,
         .stTextInput input,
         .stNumberInput input,
@@ -152,12 +201,12 @@ def apply_carch_theme(is_dark: bool):
             background-color: {input_bg} !important;
             color: {text_main} !important;
             border: 1px solid {input_border} !important;
-            border-radius: 8px !important;
+            border-radius: 12px !important;
         }}
         .stTextArea textarea:focus,
         .stTextInput input:focus {{
-            border-color: {luminous_green} !important;
-            box-shadow: 0 0 0 1px {luminous_green} !important;
+            border-color: {whoop_green} !important;
+            box-shadow: 0 0 0 1px {whoop_green} !important;
         }}
         .stTextArea textarea::placeholder,
         .stTextInput input::placeholder {{
@@ -178,14 +227,14 @@ def apply_carch_theme(is_dark: bool):
             background-color: {btn_sec_hover} !important;
         }}
 
-        /* File Uploader & Expanders */
+        /* Expanders & File Uploader */
         section[data-testid="stFileUploaderDropzone"],
         div[data-testid="stExpander"],
         details {{
             background-color: {card_bg} !important;
             color: {text_main} !important;
-            border: 1px solid {input_border} !important;
-            border-radius: 10px !important;
+            border: 1px solid {card_border} !important;
+            border-radius: 14px !important;
         }}
         div[data-testid="stExpander"] summary,
         div[data-testid="stExpander"] summary * {{
@@ -193,37 +242,42 @@ def apply_carch_theme(is_dark: bool):
             color: {text_main} !important;
         }}
 
-        /* Popover Buttons & Bodies */
+        /* Popovers */
         div[data-testid="stPopover"] > button {{
             background-color: {btn_sec_bg} !important;
             color: {text_main} !important;
-            border: 1px solid {input_border} !important;
-            border-radius: 8px !important;
+            border: 1px solid {card_border} !important;
+            border-radius: 999px !important;
+            padding: 0.35rem 1rem !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.05em !important;
         }}
         div[data-testid="stPopover"] > button * {{
             color: {text_main} !important;
         }}
         div[data-testid="stPopover"] > button:hover {{
-            background-color: {btn_sec_hover} !important;
-            border-color: {luminous_green} !important;
+            border-color: {whoop_green} !important;
         }}
         div[data-testid="stPopoverBody"] {{
             background-color: {card_bg} !important;
             color: {text_main} !important;
-            border: 1px solid {luminous_green} !important;
+            border: 1px solid {whoop_green} !important;
+            border-radius: 14px !important;
         }}
         div[data-testid="stPopoverBody"] * {{
             color: {text_main} !important;
         }}
 
-        /* Secondary Buttons */
+        /* Secondary Pill Buttons */
         button[kind="secondary"],
         section[data-testid="stFileUploaderDropzone"] button {{
             background-color: {btn_sec_bg} !important;
             color: {text_main} !important;
-            border: 1px solid {input_border} !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
+            border: 1px solid {card_border} !important;
+            border-radius: 999px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.04em !important;
         }}
         button[kind="secondary"] *,
         section[data-testid="stFileUploaderDropzone"] button * {{
@@ -232,88 +286,73 @@ def apply_carch_theme(is_dark: bool):
         button[kind="secondary"]:hover,
         section[data-testid="stFileUploaderDropzone"] button:hover {{
             background-color: {btn_sec_hover} !important;
-            border-color: {luminous_green} !important;
+            border-color: {whoop_green} !important;
         }}
 
-        /* Primary Action Button — Luminous Deloitte Green */
+        /* Primary WHOOP Luminous Action Button */
         button[kind="primary"] {{
-            background-color: {luminous_green} !important;
-            color: {primary_btn_text} !important;
+            background-color: {whoop_green} !important;
+            color: {primary_text_on_accent} !important;
             border: none !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.02em !important;
-            box-shadow: 0 0 18px rgba(151, 215, 0, 0.25) !important;
+            border-radius: 999px !important;
+            padding: 0.55rem 1.6rem !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.80rem !important;
+            letter-spacing: 0.08em !important;
+            box-shadow: 0 0 20px rgba(0, 241, 159, 0.25) !important;
         }}
         button[kind="primary"] * {{
-            color: {primary_btn_text} !important;
+            color: {primary_text_on_accent} !important;
         }}
         button[kind="primary"]:hover {{
-            background-color: {accent_green} !important;
+            background-color: {deloitte_green} !important;
         }}
 
-        /* Executive Export Download Buttons — Deloitte Green */
+        /* Export Pill Buttons */
         div[data-testid="stDownloadButton"] button {{
-            background-color: {accent_green} !important;
-            color: {primary_btn_text} !important;
+            background-color: {deloitte_green} !important;
+            color: {primary_text_on_accent} !important;
             border: none !important;
-            border-radius: 8px !important;
-            font-weight: 700 !important;
-            padding: 0.55rem 1.2rem !important;
+            border-radius: 999px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            font-size: 0.78rem !important;
+            letter-spacing: 0.07em !important;
+            padding: 0.6rem 1.4rem !important;
         }}
         div[data-testid="stDownloadButton"] button * {{
-            color: {primary_btn_text} !important;
+            color: {primary_text_on_accent} !important;
         }}
         div[data-testid="stDownloadButton"] button:hover {{
-            background-color: {luminous_green} !important;
+            background-color: {whoop_green} !important;
         }}
 
         /* Alerts */
         div[data-testid="stAlert"] {{
             background-color: {card_bg} !important;
-            border: 1px solid {luminous_green} !important;
+            border: 1px solid {whoop_green} !important;
+            border-radius: 12px !important;
             color: {text_main} !important;
         }}
         div[data-testid="stAlert"] * {{
             color: {text_main} !important;
         }}
 
-        /* Luminous Deloitte Green Active Tab Bar & Glow */
-        button[data-baseweb="tab"] {{
-            color: {text_muted} !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            font-size: 0.82rem !important;
-            letter-spacing: 0.05em !important;
-        }}
-        button[data-baseweb="tab"] * {{
-            color: {text_muted} !important;
-        }}
-        button[data-baseweb="tab"][aria-selected="true"],
-        button[data-baseweb="tab"][aria-selected="true"] * {{
-            color: {luminous_green} !important;
-            border-bottom-color: {luminous_green} !important;
-        }}
-        div[data-baseweb="tab-highlight"] {{
-            background-color: {luminous_green} !important;
-            height: 3px !important;
-            box-shadow: 0 0 12px {luminous_green} !important;
-        }}
-
-        /* Interactive DataFrames Synced with Theme */
+        /* DataFrames */
         div[data-testid="stDataFrame"] {{
             filter: {df_filter};
-            border-radius: 10px !important;
+            border-radius: 14px !important;
             overflow: hidden !important;
             border: 1px solid {card_border} !important;
         }}
     </style>
     """, unsafe_allow_html=True)
 
-apply_carch_theme(st.session_state.dark_mode)
+apply_whoop_theme(st.session_state.dark_mode)
 
 # =============================================================================
-# 3. SAMPLE DATASET (Consulting & People Analytics Schema)
+# 3. SAMPLE DATASET
 # =============================================================================
 @st.cache_data
 def load_sample_consulting_data() -> pd.DataFrame:
@@ -328,12 +367,8 @@ def load_sample_consulting_data() -> pd.DataFrame:
     })
 
 # =============================================================================
-# 4. BRAND HEADER, SESSION STATE & DATA INGESTION
+# 4. SESSION STATE & DATA INGESTION
 # =============================================================================
-st.markdown("# 🏛️ C.Arch <span style='color:#97D700;'>●</span>", unsafe_allow_html=True)
-st.markdown("#### Consulting Architecture & People Analytics Workbench")
-st.write("")
-
 if "active_ai_prompt" not in st.session_state:
     st.session_state.active_ai_prompt = ""
 if "ai_transformed_df" not in st.session_state:
@@ -341,63 +376,35 @@ if "ai_transformed_df" not in st.session_state:
 if "last_uploaded_name" not in st.session_state:
     st.session_state.last_uploaded_name = None
 
-with st.expander("📂 Upload Client Dataset (CSV / Excel) or Toggle Sample Sandbox", expanded=False):
-    up_c1, up_c2 = st.columns([3, 1])
-    with up_c1:
-        uploaded_file = st.file_uploader("Upload CSV or Excel (.xlsx):", type=["csv", "xlsx", "xls"])
-    with up_c2:
-        st.write("")
-        st.write("")
-        use_sample = st.checkbox("Use Built-In Consulting Dataset", value=(uploaded_file is None))
-
-df = None
-source_label = None
-
-if uploaded_file is not None:
-    source_label = uploaded_file.name
-    if st.session_state.last_uploaded_name != source_label:
-        st.session_state.ai_transformed_df = None
-        st.session_state.last_uploaded_name = source_label
-    try:
-        df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith(".csv") else pd.read_excel(uploaded_file)
-    except Exception as e:
-        st.error(f"Error reading file: {e}")
-elif use_sample:
-    source_label = "sample_consulting_data"
-    if st.session_state.last_uploaded_name != source_label:
-        st.session_state.ai_transformed_df = None
-        st.session_state.last_uploaded_name = source_label
-    df = load_sample_consulting_data()
-
 # =============================================================================
-# 5. SIDEBAR (C.Arch Branding + 12 Excel Controls + API + 14 Playbook)
+# 5. SIDEBAR (WHOOP Control Deck)
 # =============================================================================
 with st.sidebar:
-    st.markdown("## 🏛️ C.Arch <span style='color:#97D700;'>●</span>", unsafe_allow_html=True)
-    st.caption("Consulting Architecture & People Analytics")
+    st.markdown("## 🏛️ C.ARCH")
+    st.caption("CONSULTING ARCHITECTURE • V1.0")
 
-    mode_label = "🌑 AMOLED Dark Mode" if st.session_state.dark_mode else "☀️ Daylight Mode"
+    mode_label = "🌑 AMOLED DARK" if st.session_state.dark_mode else "☀️ DAYLIGHT MODE"
     mode_toggle = st.toggle(mode_label, value=st.session_state.dark_mode)
     if mode_toggle != st.session_state.dark_mode:
         st.session_state.dark_mode = mode_toggle
         st.rerun()
 
     if st.session_state.ai_transformed_df is not None:
-        if st.button("🔄 Reset AI Transformations", use_container_width=True):
+        if st.button("🔄 RESET AI PIPELINE", use_container_width=True):
             st.session_state.ai_transformed_df = None
             st.rerun()
 
     st.divider()
 
     # --- A. DATA HYGIENE & 12 EXCEL CONTROLS ---
-    st.markdown("### 🧹 Data Hygiene")
-    st.caption("Standardize raw exports before analysis.")
+    st.markdown("<div class='whoop-section-label'>🧹 HYGIENE PROTOCOLS</div>", unsafe_allow_html=True)
+    st.caption("Deterministic standardization rules:")
 
     ctrl_dedup = st.checkbox("1. Remove duplicate rows", value=False)
     ctrl_trim = st.checkbox("2. Trim spaces & standardize casing", value=False)
     ctrl_drop_na = st.checkbox("3. Drop rows with missing values", value=False)
 
-    with st.expander("⚙️ More Excel Controls (4–12)", expanded=False):
+    with st.expander("⚙️ Extended Excel Controls (4–12)", expanded=False):
         ctrl_title = st.checkbox("4. Title Case text (Excel PROPER)", value=False)
         ctrl_drop_empty_cols = st.checkbox("5. Drop >80% empty columns", value=False)
         ctrl_fill_num = st.selectbox(
@@ -409,13 +416,13 @@ with st.sidebar:
         ctrl_abs_num = st.checkbox("9. Force negative numbers positive (ABS)", value=False)
         ctrl_round = st.checkbox("10. Round decimals to 2 places", value=False)
         ctrl_row_id = st.checkbox("11. Insert 'Row_ID' index (1, 2, 3...)", value=False)
-        sort_col = st.selectbox("12. Sort dataset by:", ["(Original Order)"] + (list(df.columns) if df is not None else []))
+        sort_col = st.selectbox("12. Sort dataset by:", ["(Original Order)"])
         sort_asc = st.radio("Sort direction:", ["Ascending (A→Z)", "Descending (Z→A)"], horizontal=True)
 
     st.divider()
 
     # --- B. AI CO-PILOT ---
-    st.markdown("### 🤖 AI Co-Pilot")
+    st.markdown("<div class='whoop-section-label'>🤖 AI ENGINE</div>", unsafe_allow_html=True)
     default_api_key = ""
     try:
         if "GEMINI_API_KEY" in st.secrets:
@@ -425,8 +432,8 @@ with st.sidebar:
 
     if default_api_key:
         api_key = default_api_key
-        st.success("🟢 Hosted Gemini Engine: Active")
-        with st.expander("Override API Key (Optional)", expanded=False):
+        st.success("● GEMINI ENGINE: ONLINE")
+        with st.expander("Override API Key", expanded=False):
             custom_key = st.text_input("Custom Gemini API Key", type="password")
             if custom_key:
                 api_key = custom_key
@@ -436,9 +443,9 @@ with st.sidebar:
 
     st.divider()
 
-    # --- C. 14-SCENARIO EXCEL & CONSULTING PROMPT PLAYBOOK ---
-    st.markdown("### 📘 Consulting Prompt Playbook")
-    st.caption("Load everyday Excel & consulting workflows:")
+    # --- C. 14-SCENARIO CONSULTING PROMPT PLAYBOOK ---
+    st.markdown("<div class='whoop-section-label'>📘 CONSULTING PLAYBOOK</div>", unsafe_allow_html=True)
+    st.caption("14 pre-engineered analytical workflows:")
 
     EXCEL_PLAYBOOK = {
         "— Select a Scenario —": "",
@@ -501,13 +508,63 @@ with st.sidebar:
     }
 
     chosen_template = st.selectbox("Choose Workflow:", list(EXCEL_PLAYBOOK.keys()))
-    if st.button("📥 Load Prompt into Box", use_container_width=True):
+    if st.button("📥 LOAD INTO COMMAND BOX", use_container_width=True):
         if EXCEL_PLAYBOOK[chosen_template]:
             st.session_state.active_ai_prompt = EXCEL_PLAYBOOK[chosen_template]
             st.toast(f"Loaded: {chosen_template}")
 
 # =============================================================================
-# 6. MAIN WORKSPACE
+# 6. WHOOP TOP COMMAND HEADER & DATA SOURCE INGESTION
+# =============================================================================
+head_l, head_r = st.columns([4.5, 1.5])
+with head_l:
+    st.markdown(
+        "<h1 style='margin-bottom:0;'>🏛️ C.ARCH <span style='color:#00F19F; font-size:1.1rem; vertical-align:middle;'>● LIVE</span></h1>"
+        "<p style='font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; opacity:0.72; margin-top:2px;'>"
+        "Consulting Architecture & People Analytics Workbench</p>",
+        unsafe_allow_html=True,
+    )
+with head_r:
+    st.write("")
+    status_badge = "🟢 ENGINE READY" if api_key else "🟡 KEY REQUIRED"
+    st.markdown(
+        f"<div style='text-align:right; padding-top:8px;'>"
+        f"<span style='background:#161920; color:#00F19F; border:1px solid #262C38; padding:6px 14px; "
+        f"border-radius:999px; font-size:0.72rem; font-weight:800; letter-spacing:0.1em;'>{status_badge}</span>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
+
+with st.expander("📂 DATA SOURCE • Upload CSV/Excel or Toggle Sample Sandbox", expanded=False):
+    up_c1, up_c2 = st.columns([3, 1])
+    with up_c1:
+        uploaded_file = st.file_uploader("Upload CSV or Excel (.xlsx):", type=["csv", "xlsx", "xls"])
+    with up_c2:
+        st.write("")
+        st.write("")
+        use_sample = st.checkbox("Use Built-In Consulting Dataset", value=(uploaded_file is None))
+
+df = None
+source_label = None
+
+if uploaded_file is not None:
+    source_label = uploaded_file.name
+    if st.session_state.last_uploaded_name != source_label:
+        st.session_state.ai_transformed_df = None
+        st.session_state.last_uploaded_name = source_label
+    try:
+        df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith(".csv") else pd.read_excel(uploaded_file)
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
+elif use_sample:
+    source_label = "sample_consulting_data"
+    if st.session_state.last_uploaded_name != source_label:
+        st.session_state.ai_transformed_df = None
+        st.session_state.last_uploaded_name = source_label
+    df = load_sample_consulting_data()
+
+# =============================================================================
+# 7. MAIN WORKSPACE
 # =============================================================================
 if df is not None:
     if st.session_state.ai_transformed_df is not None:
@@ -559,36 +616,106 @@ if df is not None:
         df.insert(0, "Row_ID", range(1, len(df) + 1))
 
     # -------------------------------------------------------------------------
-    # SECTION 1: DATA HEALTH OVERVIEW + INFO POPOVER
+    # SECTION 1: WHOOP BIOMETRIC DATA READINESS & TELEMETRY OVERVIEW
     # -------------------------------------------------------------------------
     h1_col, h1_info = st.columns([6, 1])
     with h1_col:
-        st.subheader("1. Data Health Overview")
+        st.markdown("<div class='whoop-section-label'>01 // DATA READINESS & TELEMETRY</div>", unsafe_allow_html=True)
     with h1_info:
-        with st.popover("ℹ️ Info"):
+        with st.popover("ℹ️ INFO"):
             st.markdown("""
-            **Executive Data Audit:**
-            - **Total Records & Variables:** Dimensions of your active table (`rows × columns`).
-            - **Duplicate Rows:** Exact repeated rows that distort means and counts.
-            - **Missing Cells:** Total `NaN` / empty cells across the entire dataset.
+            **WHOOP-Style Data Readiness Score:**
+            - **Readiness Ring (`0%–100%`):** Measures structural cleanliness (`100%` minus duplicate and missing-cell penalties).
+            - **Green (`85%–100%`):** Optimal for executive modeling.
+            - **Amber (`65%–84%`):** Moderate noise—apply sidebar hygiene controls.
+            - **Red (`<65%`):** High data strain—deduplicate and impute blanks before exporting.
             """)
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total Records", f"{df.shape[0]:,}")
-    c2.metric("Variables", df.shape[1])
-    c3.metric("Duplicate Rows", int(df.duplicated().sum()))
-    c4.metric("Missing Cells", int(df.isna().sum().sum()))
+    total_cells = max(1, df.shape[0] * df.shape[1])
+    dup_count = int(df.duplicated().sum())
+    miss_count = int(df.isna().sum().sum())
+    penalty = ((dup_count / max(1, df.shape[0])) * 50) + ((miss_count / total_cells) * 50)
+    readiness_pct = int(max(0, min(100, round(100 - penalty))))
 
+    if readiness_pct >= 85:
+        ring_color = "#00F19F"
+        ring_status = "OPTIMAL • READY FOR DELIVERY"
+    elif readiness_pct >= 65:
+        ring_color = "#FFB800"
+        ring_status = "MODERATE • HYGIENE RECOMMENDED"
+    else:
+        ring_color = "#FF3B5C"
+        ring_status = "HIGH STRAIN • CLEAN BEFORE MODELING"
+
+    circumference = 2 * 3.14159 * 42
+    dash_offset = circumference * (1 - readiness_pct / 100.0)
+
+    k0, k1, k2, k3, k4 = st.columns([1.35, 1, 1, 1, 1])
+
+    with k0:
+        st.markdown(f"""
+        <div class="whoop-card" style="align-items:center; text-align:center; border-color:{ring_color}44;">
+            <div class="whoop-card-title">DATA READINESS</div>
+            <svg width="108" height="108" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke="#1F242D" stroke-width="9" fill="none" />
+                <circle cx="50" cy="50" r="42" stroke="{ring_color}" stroke-width="9" fill="none"
+                        stroke-dasharray="{circumference:.1f}" stroke-dashoffset="{dash_offset:.1f}"
+                        stroke-linecap="round" transform="rotate(-90 50 50)" />
+                <text x="50" y="55" text-anchor="middle" fill="{ring_color}" font-size="20" font-weight="800">{readiness_pct}%</text>
+            </svg>
+            <div class="whoop-card-sub" style="color:{ring_color}; font-size:0.68rem; letter-spacing:0.08em;">{ring_status}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k1:
+        st.markdown(f"""
+        <div class="whoop-card">
+            <div class="whoop-card-title">TOTAL RECORDS</div>
+            <div class="whoop-card-value">{df.shape[0]:,}</div>
+            <div class="whoop-card-sub">ACTIVE OBSERVATIONS</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k2:
+        st.markdown(f"""
+        <div class="whoop-card">
+            <div class="whoop-card-title">VARIABLES</div>
+            <div class="whoop-card-value">{df.shape[1]}</div>
+            <div class="whoop-card-sub">SCHEMA DIMENSIONS</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k3:
+        dup_color = "#00F19F" if dup_count == 0 else "#FFB800"
+        st.markdown(f"""
+        <div class="whoop-card">
+            <div class="whoop-card-title">DUPLICATE ROWS</div>
+            <div class="whoop-card-value" style="color:{dup_color};">{dup_count}</div>
+            <div class="whoop-card-sub" style="color:{dup_color};">{"ZERO DUPLICATES" if dup_count == 0 else "ACTION AVAILABLE"}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with k4:
+        miss_color = "#00F19F" if miss_count == 0 else "#FF3B5C"
+        st.markdown(f"""
+        <div class="whoop-card">
+            <div class="whoop-card-title">MISSING CELLS</div>
+            <div class="whoop-card-value" style="color:{miss_color};">{miss_count}</div>
+            <div class="whoop-card-sub" style="color:{miss_color};">{"100% POPULATED" if miss_count == 0 else "IMPUTE IN SIDEBAR"}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.write("")
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 2: AI DATA INSTRUCTION BOX + PROMPT TIPS POPOVER
+    # SECTION 2: AI DATA COMMAND CONSOLE
     # -------------------------------------------------------------------------
     h2_col, h2_info = st.columns([6, 1])
     with h2_col:
-        st.subheader("2. AI Data Instruction Box")
+        st.markdown("<div class='whoop-section-label'>02 // AI TRANSFORMATION CONSOLE</div>", unsafe_allow_html=True)
     with h2_info:
-        with st.popover("ℹ️ Prompt Tips"):
+        with st.popover("ℹ️ PROMPT TIPS"):
             st.markdown("""
             **Example Multi-Task Instructions:**
             - *"Sort rows by Engagement_Score descending"*
@@ -598,19 +725,19 @@ if df is not None:
             """)
 
     instruction = st.text_area(
-        "Enter a plain-English transformation or filtering rule (or load a template from the sidebar):",
+        "Enter a plain-English transformation or filtering rule (or load a workflow from the sidebar):",
         value=st.session_state.active_ai_prompt,
-        height=85,
+        height=82,
         placeholder="e.g., Filter rows where Attrition_Risk > 3.0 and sort by Engagement_Score descending"
     )
 
-    run_ai = st.button("⚡ Execute AI Transformation", type="primary")
+    run_ai = st.button("⚡ EXECUTE AI TRANSFORMATION", type="primary")
 
     if run_ai and instruction:
         if not api_key:
             st.warning("Open the left sidebar and connect your Gemini API key to activate AI transformations.")
         else:
-            with st.spinner("Generating audit-ready pandas transformation..."):
+            with st.spinner("Compiling audit-ready pandas pipeline..."):
                 try:
                     client = genai.Client(api_key=api_key)
                     prompt = f"""
@@ -651,15 +778,17 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 3: TABBED WORKSPACE (Luminous Deloitte Green Active Indicators)
+    # SECTION 3: WHOOP PILL-TABBED ANALYTICAL WORKSPACE
     # -------------------------------------------------------------------------
+    st.markdown("<div class='whoop-section-label'>03 // DIAGNOSTICS & MODELING</div>", unsafe_allow_html=True)
+
     tab_work, tab_piv, tab_seg, tab_corr, tab_calc, tab_docs = st.tabs([
         "📋 Working Dataset",
-        "📊 Recommended Pivot Tables",
-        "📈 Group Segmentation",
-        "🧠 Behavioral Correlation Matrix",
+        "📊 Pivot Engine",
+        "📈 Segmentation",
+        "🧠 Correlations",
         "🧮 Formula Builder",
-        "📘 User Guide & Documentation",
+        "📘 Manual",
     ])
 
     pivot_df = None
@@ -670,9 +799,9 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     with tab_work:
         w_top, w_info = st.columns([6, 1])
         with w_top:
-            st.caption("Live table reflecting all active sidebar hygiene rules, AI commands, and Formula Builder columns.")
+            st.caption("Live telemetry table reflecting active sidebar hygiene rules, AI transformations, and Formula Builder columns.")
         with w_info:
-            with st.popover("ℹ️ Info"):
+            with st.popover("ℹ️ INFO"):
                 st.markdown("""
                 **Working Dataset — How It Works:**
                 - **Live Pipeline:** Updates automatically whenever you toggle sidebar cleaning rules, execute an AI instruction, or apply a Formula Builder column.
@@ -710,11 +839,11 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
         with p_top:
             st.caption("Instant executive summaries and cross-tabulations modeled after Excel PivotTables.")
         with p_info:
-            with st.popover("ℹ️ Info"):
+            with st.popover("ℹ️ INFO"):
                 st.markdown("""
-                **Recommended Pivot Tables — How It Works:**
+                **Pivot Engine — How It Works:**
                 - **Smart Auto-Detection:** C.Arch automatically pairs your primary category and metric columns into ready-made executive pivots.
-                - **`% of Total` Share:** Automatically calculated on single-dimension `sum` and `count` pivots for rapid Pareto / contribution analysis.
+                - **`% of Total` Share:** Automatically calculated on single-dimension `sum` and `count` pivots for rapid Pareto analysis.
                 - **Workbook Sync:** Whatever Pivot Table is active here is automatically saved into the **`Pivot_Summary`** tab when you click **Export Multi-Sheet Excel (.xlsx)**.
                 """)
 
@@ -764,10 +893,10 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
         with s_top:
             st.caption("Multi-metric breakdown (`Count`, `Mean`, and `Sum`) across every numeric variable simultaneously.")
         with s_info:
-            with st.popover("ℹ️ Info"):
+            with st.popover("ℹ️ INFO"):
                 st.markdown("""
                 **Group Segmentation — How It Works:**
-                - **All-Metric View:** Unlike a single Pivot Table, Group Segmentation evaluates *every* numeric column simultaneously across your chosen category.
+                - **All-Metric View:** Evaluates *every* numeric column simultaneously across your chosen category.
                 - **Consulting Tip:** Always check **`count`** alongside **`mean`** and **`sum`** so small sample groups are not mistaken for systemic trends.
                 """)
 
@@ -785,13 +914,13 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
         with c_top:
             st.caption("Pearson correlation matrix measuring linear relationships across numeric variables.")
         with c_info:
-            with st.popover("ℹ️ Info"):
+            with st.popover("ℹ️ INFO"):
                 st.markdown("""
                 **Behavioral Correlation Matrix — How It Works:**
                 - **`+0.70 to +1.00`:** Strong positive relationship (both metrics move up together).
                 - **`-0.70 to -1.00`:** Strong inverse relationship (as one rises, the other falls).
                 - **`-0.20 to +0.20`:** Little to no linear relationship.
-                - **Auto-Insights:** C.Arch automatically extracts the strongest variable pairs below the matrix to save scanning time.
+                - **Auto-Insights:** C.Arch automatically extracts the strongest variable pairs below the matrix.
                 """)
 
         if len(num_cols) >= 2:
@@ -820,12 +949,12 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
         with f_top:
             st.caption("Create deterministic Excel-style calculated columns and conditional flags with zero code.")
         with f_info:
-            with st.popover("ℹ️ How to Use Formula Builder"):
+            with st.popover("ℹ️ HOW TO USE"):
                 st.markdown("""
                 **How to Use Formula Builder (3 Steps):**
-                1. **Choose Formula Type:** Pick **Two-Column Math** (`+`, `-`, `*`, `/`, `% Delta`) for ratios/variances, or **Conditional IF Flag** (`=IF`) for risk/performance thresholds.
-                2. **Configure Inputs & Name:** Select your source column(s), set your operator or numeric threshold, and name your new output column.
-                3. **Activate:** Check **Apply Column to Working Dataset**—your new column immediately appears in the **Working Dataset** tab and is included in your final CSV/Excel export.
+                1. **Choose Formula Type:** Pick **Two-Column Math** (`+`, `-`, `*`, `/`, `% Delta`) or **Conditional IF Flag** (`=IF`).
+                2. **Configure Inputs & Name:** Select your source column(s), set your operator or threshold, and name your output column.
+                3. **Activate:** Check **Apply Column to Working Dataset**—your new column immediately appears in the **Working Dataset** tab and exports to Excel/CSV.
                 """)
 
         sub_math, sub_if = st.tabs(["Two-Column Math (+, -, *, /, % Delta)", "Conditional IF Flag (=IF)"])
@@ -888,23 +1017,23 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     with tab_docs:
         st.markdown("""
         ### 🏛️ C.Arch Platform Manual — Fast-Track Workflow
-        1. **Step 1 — Ingest & Audit:** Upload any CSV or Excel workbook at the top (or test with the built-in consulting dataset) and verify record counts, duplicates, and missing cells in **1. Data Health Overview**.
-        2. **Step 2 — Deterministic Hygiene (Left Sidebar):** Apply any of the **12 Quick Excel Controls** (`TRIM`, `PROPER`, deduplication, median/zero imputation, ISO dates, `Row_ID`, sorting) to standardize your data cleanly.
-        3. **Step 3 — AI Co-Pilot or No-Code Formulas:** Either pick one of the **14 Consulting Prompt Playbook** templates in the sidebar to run multi-step AI transformations, or use the **Formula Builder** tab for instant deterministic Excel math and `=IF` flags.
-        4. **Step 4 — Pivot & Behavioral Diagnostics:** Inspect auto-generated summaries in **Recommended Pivot Tables**, multi-metric breakdowns in **Group Segmentation**, and key drivers in **Behavioral Correlation Matrix**.
-        5. **Step 5 — Executive Deliverable Export:** Click **Export Deliverable (CSV)** for flat tables or **Export Multi-Sheet Excel (.xlsx)** to download a complete workbook containing `Cleaned_Data`, `Pivot_Summary`, and `Summary_Stats`.
+        1. **Step 1 — Ingest & Readiness Ring:** Upload any CSV or Excel workbook at the top and inspect your live **Data Readiness Ring (`0%–100%`)** in Section 01.
+        2. **Step 2 — Deterministic Hygiene (Left Sidebar):** Apply any of the **12 Quick Excel Controls** (`TRIM`, `PROPER`, deduplication, median/zero imputation, ISO dates, `Row_ID`, sorting) to bring Data Readiness to `100%`.
+        3. **Step 3 — AI Co-Pilot or No-Code Formulas:** Pick one of the **14 Consulting Prompt Playbook** templates in the sidebar to run multi-step AI transformations, or use the **Formula Builder** tab for instant deterministic Excel math and `=IF` flags.
+        4. **Step 4 — Pivot & Behavioral Diagnostics:** Inspect auto-generated summaries in **Pivot Engine**, multi-metric breakdowns in **Segmentation**, and key drivers in **Correlations**.
+        5. **Step 5 — Executive Deliverable Export:** Download a flat `.csv` or a multi-sheet `.xlsx` workbook containing `Cleaned_Data`, `Pivot_Summary`, and `Summary_Stats`.
         """)
 
     st.write("")
 
     # -------------------------------------------------------------------------
-    # SECTION 4: LUMINOUS DELOITTE GREEN EXPORT BUTTONS
+    # SECTION 4: EXECUTIVE DELIVERABLE EXPORT
     # -------------------------------------------------------------------------
-    exp_col1, exp_col2, _ = st.columns([1.4, 1.6, 3])
+    exp_col1, exp_col2, _ = st.columns([1.4, 1.7, 3])
 
     csv_bytes = df.to_csv(index=False).encode("utf-8")
     exp_col1.download_button(
-        label="⬇️ Export Deliverable (CSV)",
+        label="⬇️ EXPORT DELIVERABLE (CSV)",
         data=csv_bytes,
         file_name="CArch_Deliverable.csv",
         mime="text/csv",
@@ -920,9 +1049,9 @@ Do not include markdown backticks, explanations, or print statements. `pd` and `
     excel_buffer.seek(0)
 
     exp_col2.download_button(
-        label="📊 Export Multi-Sheet Excel (.xlsx)",
+        label="📊 EXPORT MULTI-SHEET EXCEL (.XLSX)",
         data=excel_buffer,
         file_name="CArch_Executive_Workbook.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
-    ) 
+    )
